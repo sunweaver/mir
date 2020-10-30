@@ -112,13 +112,6 @@ int main(int argc, char const* argv[])
       }
     };
 
-    char test_buffer[20];
-    memset(test_buffer, 0, 10);
-    if (auto const test_value = test_buffer[15])
-        puts("Something happens!");
-
-    if (auto const test_value = test_buffer[21])
-        puts("Something happens!");
 
     return runner.run_with(
         {
