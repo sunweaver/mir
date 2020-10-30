@@ -24,7 +24,6 @@
 
 #include <wayland-client.h>
 
-#include <functional>
 #include <mutex>
 
 namespace mir
@@ -37,7 +36,7 @@ namespace wayland
 class Cursor : public graphics::Cursor
 {
 public:
-    Cursor(wl_compositor* compositor, wl_shm* shm, std::function<void()> flush_wl);
+    Cursor(wl_display* display, wl_compositor* compositor, wl_shm* shm);
 
     ~Cursor();
 
@@ -51,8 +50,9 @@ public:
     void leave(wl_pointer* pointer);
 
 private:
+    wl_display* const display;
     wl_shm* const shm;
-    std::function<void()> const flush_wl;
+
     wl_surface* surface;
 
     std::mutex mutable mutex;
