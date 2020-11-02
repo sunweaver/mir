@@ -417,17 +417,8 @@ mgw::DisplayClient::DisplayClient(
     std::shared_ptr<GLConfig> const& gl_config) :
     display{display},
     keyboard_context_{xkb_context_new(XKB_CONTEXT_NO_FLAGS)},
-    registry{nullptr, [](auto){}}
+    registry{wl_display_get_registry(display), &wl_registry_destroy}
 {
-    registry = {wl_display_get_registry(display), &wl_registry_destroy};
-
-    static wl_registry_listener const registry_listener = {
-        new_global,
-        remove_global
-    };
-
-    wl_registry_add_listener(registry.get(), &registry_listener, this);
-
     auto format = shm_pixel_format;
 
     EGLint const cfgattribs[] =
@@ -468,6 +459,17 @@ mgw::DisplayClient::DisplayClient(
     if (eglctx == EGL_NO_CONTEXT)
         BOOST_THROW_EXCEPTION(egl_error("eglCreateContext failed"));
 
+    static wl_registry_listener const registry_listener = {
+        new_global,
+        remove_global
+    };
+
+    wl_registry_add_listener(registry.get(), &registry_listener, this);
+
+    // This is really hacky and works by side-effects (but I've not written a clean version)
+    // The first round trip invokes the registry_listeners to register globals
+    // The second round trip invokes the listeners on those globals and completes the setup
+    wl_display_roundtrip(display);
     wl_display_roundtrip(display);
 }
 
