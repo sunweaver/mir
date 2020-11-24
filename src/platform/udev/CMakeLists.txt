@@ -2,5 +2,18 @@ add_library(mirudev OBJECT
   udev_wrapper.cpp
 )
 
-list(APPEND MIR_PLATFORM_REFERENCES ${UDEV_LDFLAGS} ${UDEV_LIBRARIES})
-set(MIR_PLATFORM_REFERENCES ${MIR_PLATFORM_REFERENCES} PARENT_SCOPE)
+target_link_libraries(
+  mirudev
+
+  PUBLIC
+    PkgConfig::UDEV
+)
+
+target_include_directories(
+  mirudev
+
+  PUBLIC
+    ${PROJECT_SOURCE_DIR}/include/platform
+  PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/include/platform
+)
